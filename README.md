@@ -2,7 +2,11 @@
 
 ## Resources and Examples
 
+### p5 js
+https://www.youtube.com/watch?v=ixFCsST2pF4
 
+### wasm image based
+https://github.com/ColinEberhardt/wasm-mandelbrot
 
 # Getting Started with Create React App
 

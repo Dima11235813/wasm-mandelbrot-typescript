@@ -36,3 +36,26 @@
     transform: rotate(360deg);
   }
 }
+
+
+#canvas {
+  width: 600px;
+  height: 400px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px
+}
+#mode {
+  width: 200px;
+  display: inline-block;
+}
+#render {
+  margin-right: 20px;
+}
+p {
+  margin-top: 1rem;
+}
+.jumbotron {
+  padding: 2rem;
+}
