@@ -30,7 +30,7 @@ double scale(double domainStart, double domainLength, int screenLength, int step
   return domainStart + domainLength * ((double)(step - screenLength) / (double)screenLength);
 }
 
-void mandelbrot(int maxIterations, double cx, double cy, double diameter) {
+unsigned char[] mandelbrot(int maxIterations, double cx, double cy, double diameter) {
   double verticalDiameter = diameter * HEIGHT / WIDTH;
   for(int x = 0.0; x < WIDTH; x++) {
     for(int y = 0.0; y < HEIGHT; y++) {
@@ -46,6 +46,7 @@ void mandelbrot(int maxIterations, double cx, double cy, double diameter) {
       image[idx + 3] = 255;
     }
   }
+  return image
 }
 
 unsigned char* getImage() {

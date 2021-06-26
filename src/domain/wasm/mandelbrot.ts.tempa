@@ -1,4 +1,6 @@
-export default async() => {
+import { IMandlebrotConfig } from "../../models/mandlebrotConfig";
+
+module.exports = async () => {
   const WIDTH = 1200, HEIGHT = 800;
 
   const res = await fetch('wasm/mandelbrot.wasm');
@@ -8,18 +10,17 @@ export default async() => {
 
   return {
     name: 'WebAssembly',
-    render: (ctx: any, config:any) => {
-      // debugger
+    render: (ctx: CanvasRenderingContext2D, config: IMandlebrotConfig) => {
+      debugger
       (instance.exports.mandelbrot as any)(config.iterations, config.x, config.y, config.d)
 
-      const imgData = ctx.createImageData(WIDTH, HEIGHT);
-      // debugger
+      // const imgData = ctx.createImageData(WIDTH, HEIGHT);
       const offset = (instance.exports as any).getImage();
-      // debugger
       const linearMemory = new Uint8Array((instance.exports.memory as any).buffer, offset, WIDTH * HEIGHT * 4);
-      imgData.data.set(linearMemory);
+      // imgData.data.set(linearMemory);
+      // config.updateImageData(linearMemory)
       // debugger
-      ctx.putImageData(imgData, 0, 0);
+      // ctx.putImageData(imgData, 0, 0);
     },
     description: 'This implementation creates a minimal wasm module by compiling C using clang / llc and the binaryen tools directly (as opposed to emscripten, that wraps up clang / llc together with its own framework code).'
   }

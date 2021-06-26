@@ -1,6 +1,9 @@
 # WASM Mandelbrot Typescript
 
 ## Resources and Examples
+## Emscripten
+
+https://emscripten.org/docs/getting_started/downloads.html
 
 ### p5 js
 https://www.youtube.com/watch?v=ixFCsST2pF4

@@ -9,7 +9,7 @@ module.exports = async() => {
   return {
     name: 'WebAssembly',
     render: (ctx, config) => {
-      debugger
+      // debugger
       instance.exports.mandelbrot(config.iterations, config.x, config.y, config.d)
 
       const imgData = ctx.createImageData(WIDTH, HEIGHT);

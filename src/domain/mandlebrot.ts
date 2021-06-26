@@ -1,97 +1,134 @@
-import { defaultMandlebrotConfig, IMandlebrotConfig } from "../models/mandlebrotConfig";
-import { timeExecution } from "../utils/timeUtils";
+import { MandlebrotConfig } from "../models/mandlebrotConfig";
+// import p5 from "p5";
 
 export class Mandlebrot {
 
-    //TODO Move to ctor for dynamic window calc
-    static WIDTH = 1200
-    static HEIGHT = 800;
-
-    public _WIDTH = Mandlebrot.WIDTH
-    public _HEIGHT = Mandlebrot.HEIGHT
 
     public canvas!: HTMLCanvasElement
-    public ctx!: CanvasRenderingContext2D
-    public modeSelect!: HTMLElement
+    public ctx: CanvasRenderingContext2D | null
+    // public modeSelect!: HTMLElement
 
-    public config!: IMandlebrotConfig | null
-    public renderers: any[] = []
+    public config!: MandlebrotConfig | null
+    public renderer: any
+
+    // public p!: p5
+    // public p5renderer!: p5.Renderer;
 
     // the 'seahorse tail' 
     // https://commons.wikimedia.org/wiki/File:Mandel_zoom_04_seehorse_tail.jpg
 
-    constructor() {
-        this.config = defaultMandlebrotConfig
-        this.canvas = document.getElementById('canvas') as HTMLCanvasElement
-        this.ctx = this.canvas?.getContext('2d') as CanvasRenderingContext2D
-        this.ctx.scale(2, 2);
-        debugger
-    }
-    
-    bootstrap = async () => {
-        debugger
-        
-        this.modeSelect = document.getElementById('mode') as HTMLElement
-        this.clearCanvas();
-        debugger
-        
-        this.renderers = [
-            await require('./wasm/mandelbrot.js')(),
-            // await require('js/mandelbrot.js')(),
-            // await require('emscripten/mandelbrot.js')(),
-            // await require('assemblyscript/mandelbrot-asc.js')(),
-            // // await require('assemblyscript/mandelbrot-tsc.js')(),
-            // await require('asmjs/mandelbrot.js')(),
-        ];
-        
-        this.renderers.forEach((renderer, index) => {
-            debugger
-            const option = document.createElement('option') as HTMLOptionElement
-            option.value = `${index}`;
-            option.innerHTML = renderer.name;
-            this.modeSelect.appendChild(option);
-        });
-        
-        const selectedRenderer = window.location.hash ? window.location.hash.slice(1) : this.renderers[0].name;
-        (this.modeSelect as any).selectedIndex = Array.apply(null, (this.modeSelect as any).options).findIndex(o => (o as any).text === selectedRenderer) as any
-    
-        
-        (document.getElementById('render') as HTMLElement)
-        .addEventListener('click', () => this.render());
-        
-        (document.getElementById('renderPerf') as HTMLElement)
-        .addEventListener('click', () => this.render(10));
-        
-        this.modeSelect
-        .addEventListener('change', () => this.render());
-        debugger
+    recalcInProg: boolean = false
 
-        this.render();
+    constructor(canvasContainer: HTMLCanvasElement) {
+        this.config = new MandlebrotConfig()
+        this.canvas = canvasContainer
+        this.ctx = this.canvas.getContext('2d');
+        this.canvas.addEventListener(
+            'click',
+            (event) => this.handleMouseClick(
+                this,
+                event
+            ))
+
+        this.init()
+        // new p5(this.bootstrap, canvasContainer)
     }
-    render = async (iterations = 1) => {
-        debugger
-        const renderer = this.renderers[(this.modeSelect as any).value];
-        window.location.hash = '#' + renderer.name;
-        (document.getElementById('description') as HTMLElement).innerHTML = renderer.description;
-        this.clearCanvas();
-        debugger
-        await this.wait(10);
-        debugger
-        const executionTime = timeExecution(() => {
-            debugger
-            for (let i = 0; i < iterations; i++) {
-                renderer.render(this.ctx, this.config);
-            }
-        });
-        (document.getElementById('execution') as HTMLElement).innerHTML = (executionTime / iterations).toFixed(2);
+
+    init = async () => {
+        await this.loadWasm()
+        await this.renderWithWasm()
+    }
+
+    renderWithWasm = async () => {
+        //Avoid more than one click handler at a time
+        if (!this.recalcInProg) {
+            console.log(`Calling renderWithWasm with config`)
+            console.log(this.config)
+            this.recalcInProg = true
+            await this.renderer.render(this.ctx, this.config)
+            console.log(`render completed`)
+            this.recalcInProg = false
+        }
+    }
+
+    // bootstrap = async (p: p5) => {
+    //     this.p = p
+
+    //     await this.loadWasm()
+    //     p.setup = this.setup
+    //     // p.draw = this.draw
+    //     p.mouseClicked = this.handleMouseClick
+    // }
+    loadWasm = async () => {
+        this.renderer = await require('./wasm/mandelbrot.js')()
+    }
+    // setup = async () => {
+    //     // debugger
+    //     this.p5renderer = this.p.createCanvas(
+    //         Mandlebrot.WIDTH,
+    //         Mandlebrot.HEIGHT,
+    //         'p2d'// 'webgl'
+    //     );
+    //     // this.p5context = (this.p5renderer as any).drawingContext.canvas.getContext('2d')
+    //     debugger
+    //     await this.renderer.render(this.ctx, this.config)
+    // }
+    draw = () => {
+        if (this.config?.imageData && this.config?.imageData?.length > 0) {
+            // debugger
+            // this.p.image(this.config.imageData, 0, 0)
+            // debugger
+            // this.p.updatePixels()
+        }
+        // this.p.loadPixels()
+        // //Now that we have pixels in config
+        // if (this.config?.pixels) {
+        //     // for(let x= 0; x < this.p.width; x++){
+        //     //     for(let y= 0; y < this.p.height; y++){
+        //     //         this.
+        //     //     }    
+        //     // }
+        //     // this.p.pixels = this.config?.pixels as any
+        //     for (let i = 0; i < this.config.pixels.length; i += 4) {
+        //         let xValue = i % this.p.width
+        //         let yValue = i % this.p.height
+        //         let color = this.p.color(
+        //             this.config.pixels[i],
+        //             this.config.pixels[i + 1],
+        //             this.config.pixels[i + 2]
+        //         )
+        //         debugger
+        //         this.p.set(
+        //             xValue,
+        //             yValue,
+        //             color
+        //         );
+        //     }
+        //     debugger
+        // }
+        // this.p.updatePixels()
+    }
+    handleMouseClick = async (context: any, event: any) => {
+        // let newX = event.x
+        // let newY = event.y
+        if (this.config) {
+            this.config.x = this.config.x + (this.config.x * this.config.zoomFactor)
+            this.config.y = this.config.y + (this.config.y * this.config.zoomFactor)
+            // this.config.d = this.config.d * this.config.zoomFactor
+            // this.config.x = this.config.x * (this.config.WIDTH - newX)
+            // this.config.y = this.config.y * (this.config.HEIGHT - newY)
+            // this.config.x = this.p.width / newX
+            // this.config.y = this.p.height / newY
+            await this.renderWithWasm()
+        }
     }
 
     //UTILS to move to utils files
-    clearCanvas = () => {
-        if (this.ctx) {
-            this.ctx.fillStyle = 'black';
-            this.ctx.fillRect(0, 0, this._WIDTH, this._HEIGHT);
-        }
-    }
-    wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+    // clearCanvas = () => {
+    //     if (this.ctx) {
+    //         this.ctx.fillStyle = 'black';
+    //         this.ctx.fillRect(0, 0, this._WIDTH, this._HEIGHT);
+    //     }
+    // }
+    // wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 }
