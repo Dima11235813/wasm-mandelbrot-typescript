@@ -1,4 +1,6 @@
 import { MandlebrotConfig } from "../models/mandlebrotConfig";
+import papa from 'papaparse';
+import data from '../grid.json'
 // import p5 from "p5";
 
 export class Mandlebrot {
@@ -23,20 +25,43 @@ export class Mandlebrot {
         this.config = new MandlebrotConfig()
         this.canvas = canvasContainer
         this.ctx = this.canvas.getContext('2d');
-        this.canvas.addEventListener(
-            'click',
-            (event) => this.handleMouseClick(
-                this,
-                event
-            ))
+        // this.canvas.addEventListener(
+        //     'click',
+        //     (event) => this.handleMouseClick(
+        //         this,
+        //         event
+        //     ))
 
         this.init()
         // new p5(this.bootstrap, canvasContainer)
     }
-
     init = async () => {
-        await this.loadWasm()
-        await this.renderWithWasm()
+        // const csvFilePath = './grid.csv';
+
+        // papa.parse(csvFilePath, {
+        //     header: true,
+        //     delimiter: ',',
+        //     dynamicTyping: true,
+        //     complete: (results: any) => {
+        //         this.data = results.data;
+        //         console.log(this.data);
+        //         // convert data to JSON as desired
+        //     }
+        // });
+        //Other test
+        new Array(this.config?.WIDTH ?? 0).fill(0).forEach((_, col) => {
+            new Array(this.config?.HEIGHT ?? 0).fill(0).forEach((_, row) => {
+                const cell = data[col][row]
+                const color = `rgb(${cell[0]},${cell[1]},${cell[2]})`;
+                if (this.ctx) {
+                    this.ctx.fillStyle = color;
+                    this.ctx?.fillRect(col, row, 1, 1);
+                    console.log(`Rendering pixel ${col},${row} with color ${color}`)
+                }
+            })
+        })
+        // await this.loadWasm()
+        // await this.renderWithWasm()
     }
 
     renderWithWasm = async () => {

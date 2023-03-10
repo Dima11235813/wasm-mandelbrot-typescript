@@ -29,15 +29,15 @@ export class MandlebrotConfig implements IMandlebrotConfig {
         Width?: number,
         Height?: number
     ) {
-        this.WIDTH = Width ?? 1200
-        this.HEIGHT = Height ?? 800;
+        this.WIDTH = Width ?? 100
+        this.HEIGHT = Height ?? 100;
 
         this.zoomFactor = .05
 
-        this.x = -0.7436447860
+        this.x = -0.7436497860
         this.y = 0.1318252536
-        this.d = 0.00029336
-        this.iterations = 10000
+        this.d = 0.00039936
+        this.iterations = 2550
     }
     updateImageData = (imageData: ImageData) => {
         this.imageData = imageData

@@ -22,7 +22,7 @@ module.exports = async () => {
         WIDTH * HEIGHT * 4
       );
       imgData.data.set(linearMemory);
-      // config.updateImageData(imgData);
+      config.updateImageData(imgData);
       ctx.restore()
       ctx.putImageData(imgData, 0, 0);
       // debugger;
